@@ -131,7 +131,7 @@
     [
       "@semantic-release/exec",
       {
-        "prepareCmd": "sed -i.bak 's/version = \".*\"/version = \"${nextRelease.version}\"/' pyproject.toml && rm pyproject.toml.bak"
+        "prepareCmd": "sed -i.bak 's/^version = \".*\"/version = \"${nextRelease.version}\"/' pyproject.toml && rm pyproject.toml.bak"
       }
     ],
     [
