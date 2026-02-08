@@ -1,6 +1,6 @@
 [project]
 name = "mrcis"
-version = "0.1.0"
+version = "1.0.0"
 description = "Multi-Repository Code Intelligence System"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -78,7 +78,7 @@ build-backend = "hatchling.build"
 packages = ["src/mrcis"]
 
 [tool.ruff]
-target-version = "py311"
+target-version = "1.0.0"
 line-length = 100
 src = ["src", "tests"]
 
@@ -117,7 +117,7 @@ ignore = [
 known-first-party = ["mrcis"]
 
 [tool.mypy]
-python_version = "3.11"
+python_version = "1.0.0"
 strict = true
 warn_return_any = true
 warn_unused_ignores = false

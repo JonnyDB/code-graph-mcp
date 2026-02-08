@@ -1,3 +1,15 @@
+## 1.0.0 (2026-02-08)
+
+### ✨ Features
+
+* Add complete MRCIS implementation with 15 language extractors, ports & adapters architecture, and 858 unit tests ([a90360a](https://github.com/JonnyDB/code-graph-mcp/commit/a90360a3d53d0b4f8adf69ae80d64bd03f091b9a))
+* Add MRCIS operational hardening plan with initial resource limit configuration, rate limiter, and metrics collection, alongside new receiver-aware call resolution and demo prompt flow documentation ([0c7c6b6](https://github.com/JonnyDB/code-graph-mcp/commit/0c7c6b62ac16872690540d25f576e94bc71e6a80))
+* Introduce the initial mrcis module with extractors, models, storage, database ports, and comprehensive unit tests, including new documentation and workflow setup. ([5581274](https://github.com/JonnyDB/code-graph-mcp/commit/5581274e2ca1acfcfebf26bcf7cc3e4700a8a80e))
+
+### ♻️ Code Refactoring
+
+* flatten mrcis/ into project root and update repo references ([39f274d](https://github.com/JonnyDB/code-graph-mcp/commit/39f274dc9168c8fed0a0ae6aca59c0a64f5b458d))
+
 # Changelog
 
 All notable changes to this project will be documented in this file.
