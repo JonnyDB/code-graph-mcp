@@ -2,7 +2,7 @@
   "branches": [
     "main"
   ],
-  "repositoryUrl": "https://github.com/OWNER/REPO.git",
+  "repositoryUrl": "https://github.com/JonnyDB/code-graph-mcp.git",
   "plugins": [
     [
       "@semantic-release/commit-analyzer",
@@ -131,7 +131,7 @@
     [
       "@semantic-release/exec",
       {
-        "prepareCmd": "cd mrcis && sed -i.bak 's/version = \".*\"/version = \"${nextRelease.version}\"/' pyproject.toml && rm pyproject.toml.bak"
+        "prepareCmd": "sed -i.bak 's/version = \".*\"/version = \"${nextRelease.version}\"/' pyproject.toml && rm pyproject.toml.bak"
       }
     ],
     [
@@ -139,7 +139,7 @@
       {
         "assets": [
           "CHANGELOG.md",
-          "mrcis/pyproject.toml"
+          "pyproject.toml"
         ],
         "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
       }
@@ -151,11 +151,11 @@
         "failTitle": false,
         "assets": [
           {
-            "path": "mrcis/dist/*.whl",
+            "path": "dist/*.whl",
             "label": "Python wheel"
           },
           {
-            "path": "mrcis/dist/*.tar.gz",
+            "path": "dist/*.tar.gz",
             "label": "Python sdist"
           }
         ]

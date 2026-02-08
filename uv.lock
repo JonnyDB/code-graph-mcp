@@ -736,6 +736,12 @@ neo4j = [
 dev = [
     { name = "mypy" },
     { name = "neo4j" },
+    { name = "pre-commit" },
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+    { name = "pytest-cov" },
+    { name = "pytest-xdist" },
+    { name = "ruff" },
     { name = "types-pyyaml" },
 ]
 
@@ -770,9 +776,15 @@ provides-extras = ["dev", "neo4j"]
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "mypy", specifier = ">=1.19.1" },
+    { name = "mypy", specifier = ">=1.5" },
     { name = "neo4j", specifier = ">=5.0" },
-    { name = "types-pyyaml", specifier = ">=6.0.12.20250915" },
+    { name = "pre-commit", specifier = ">=3.0" },
+    { name = "pytest", specifier = ">=7.0" },
+    { name = "pytest-asyncio", specifier = ">=0.21" },
+    { name = "pytest-cov", specifier = ">=4.0" },
+    { name = "pytest-xdist", specifier = ">=3.0" },
+    { name = "ruff", specifier = ">=0.1" },
+    { name = "types-pyyaml", specifier = ">=6.0" },
 ]
 
 [[package]]

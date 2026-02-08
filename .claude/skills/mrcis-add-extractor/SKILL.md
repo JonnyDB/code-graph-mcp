@@ -166,7 +166,6 @@ class TestExtraction:
 ### Step 6: Verify
 
 ```bash
-cd mrcis
 uv run pytest tests/unit/extractors/test_{language}.py -v
 uv run ruff check src/mrcis/extractors/{language}.py
 uv run mypy src/mrcis/extractors/{language}.py

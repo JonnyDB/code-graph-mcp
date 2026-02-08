@@ -16,8 +16,8 @@ Thank you for your interest in contributing to the Multi-Repository Code Intelli
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/OWNER/REPO.git
-   cd rag-indexing/mrcis
+   git clone https://github.com/JonnyDB/code-graph-mcp.git
+   cd code-graph-mcp
    ```
 
 2. **Install dependencies**
@@ -269,7 +269,7 @@ You don't need to manually bump versions or create releases.
 
 - Read `CLAUDE.md` for architecture details
 - Check `.claude/skills/` for specific task guides
-- Open an issue for questions or discussions
+- [Open an issue](https://github.com/JonnyDB/code-graph-mcp/issues) for questions or discussions
 
 ## License
 

@@ -7,7 +7,7 @@ default_stages: [pre-commit]
 repos:
   # Ruff - Fast Python linter and formatter
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.8.4
+  rev: v0.15.0
   hooks:
       # Run the linter
   - id: ruff
@@ -27,7 +27,7 @@ repos:
     types: [python]
     require_serial: true
     pass_filenames: false
-    args: [mrcis/src/]
+    args: [src/]
 
   # Pytest - Run fast tests only (skip slow/integration)
 - repo: local
@@ -38,11 +38,11 @@ repos:
     language: system
     types: [python]
     pass_filenames: false
-    args: [mrcis/tests/, -v, -m, "not slow and not integration", --tb=short]
+    args: [tests/, -v, -m, "not slow and not integration", --tb=short]
 
   # Conventional Commits - Enforce commit message format
 - repo: https://github.com/compilerla/conventional-pre-commit
-  rev: v3.6.0
+  rev: v4.3.0
   hooks:
   - id: conventional-pre-commit
     stages: [commit-msg]
@@ -50,7 +50,7 @@ repos:
 
   # Standard pre-commit hooks
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v5.0.0
+  rev: v6.0.0
   hooks:
   - id: trailing-whitespace
     exclude: ^tests/fixtures/
@@ -68,7 +68,7 @@ repos:
 
   # YAML formatting
 - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
-  rev: v2.14.0
+  rev: v2.16.0
   hooks:
   - id: pretty-format-yaml
     args: [--autofix, --indent, '2', --preserve-quotes]

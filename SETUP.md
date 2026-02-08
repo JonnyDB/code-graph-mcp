@@ -5,10 +5,7 @@
 ### Local Development Setup
 
 ```bash
-# 1. Navigate to project
-cd mrcis
-
-# 2. Install dependencies
+# 1. Install dependencies
 uv sync --dev
 
 # 3. Install pre-commit hooks
@@ -30,10 +27,10 @@ git commit -m "test(setup): verify pre-commit hooks"
 
 #### 1. Update Repository URLs
 
-Edit these files with your actual GitHub repository URL:
+These files are already configured for https://github.com/JonnyDB/code-graph-mcp:
 
-- `.releaserc.json` - Update `repositoryUrl` field
-- `.github/workflows/release.yml` - Update `if: github.repository_owner == 'YOUR_ORG'`
+- `.releaserc.json` - `repositoryUrl` field
+- `.github/workflows/release.yml` - `github.repository_owner == 'JonnyDB'`
 
 #### 2. Configure Repository Secrets
 
@@ -252,7 +249,7 @@ npx semantic-release --dry-run
 Check current version:
 
 ```bash
-grep 'version =' mrcis/pyproject.toml
+grep 'version =' pyproject.toml
 ```
 
 ### Version History
@@ -270,7 +267,6 @@ cat CHANGELOG.md
 If you need to manually set version (not recommended):
 
 ```bash
-cd mrcis
 # Edit pyproject.toml
 sed -i 's/version = ".*"/version = "0.2.0"/' pyproject.toml
 
@@ -294,8 +290,6 @@ git push origin main --tags
 ### Manual Publishing (if needed)
 
 ```bash
-cd mrcis
-
 # Build package
 uv build
 

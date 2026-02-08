@@ -48,104 +48,103 @@ rag-indexing/
 ├── SYSTEM_ARCHITECTURE.md           # System design & ADRs
 ├── TECHNICAL_DESIGN.md              # Technical specifications
 ├── docs/plans/                      # Phase implementation plans
-└── mrcis/                           # Main Python package
-    ├── pyproject.toml               # Dependencies & tool config
-    ├── mise.toml                    # Task runner config
-    ├── src/mrcis/
-    │   ├── __init__.py              # Package version
-    │   ├── __main__.py              # CLI entry point (click)
-    │   ├── errors.py                # Exception hierarchy (MRCISError base)
-    │   ├── server.py                # FastMCP server with lifespan
-    │   ├── server_runtime.py        # ServerRuntime lifecycle manager
-    │   │
-    │   ├── config/
-    │   │   ├── models.py            # Pydantic config (incl. Neo4jConfig)
-    │   │   ├── loader.py            # YAML config loading
-    │   │   └── reconciler.py        # Config ↔ DB reconciliation
-    │   │
-    │   ├── models/
-    │   │   ├── entities.py          # CodeEntity, ClassEntity, FunctionEntity, etc.
-    │   │   ├── extraction.py        # ExtractionResult, EnumEntity, InterfaceEntity
-    │   │   ├── relations.py         # CodeRelation, PendingReference
-    │   │   ├── state.py             # Repository, IndexedFile
-    │   │   └── responses.py         # MCP tool response DTOs
-    │   │
-    │   ├── ports/                   # ★ Port interfaces (DIP)
-    │   │   ├── db_session.py        # DbSessionPort
-    │   │   ├── embedder.py          # EmbedderPort
-    │   │   ├── extractors.py        # ExtractorPort, ExtractorRegistryPort
-    │   │   ├── relation_graph.py    # RelationGraphPort
-    │   │   ├── state.py             # StatePort + segregated reader/writer ports (ISP)
-    │   │   └── vector_store.py      # VectorStorePort
-    │   │
-    │   ├── extractors/              # ★ Language extractors (OCP)
-    │   │   ├── base.py              # TreeSitterExtractor ABC + ExtractorProtocol
-    │   │   ├── context.py           # ExtractionContext (parameter object)
-    │   │   ├── registry.py          # ExtractorRegistry (factory)
-    │   │   ├── defaults.py          # Default extractor factory
-    │   │   ├── adapter.py           # LegacyExtractorAdapter (migration)
-    │   │   ├── python.py            # Python extractor
-    │   │   ├── typescript.py        # TypeScript extractor
-    │   │   ├── javascript.py        # JavaScript extractor
-    │   │   ├── go.py                # Go extractor
-    │   │   ├── rust.py              # Rust extractor
-    │   │   ├── java.py              # Java extractor
-    │   │   ├── kotlin.py            # Kotlin extractor
-    │   │   ├── ruby.py              # Ruby extractor
-    │   │   ├── markdown.py          # Markdown extractor
-    │   │   ├── dockerfile.py        # Dockerfile extractor
-    │   │   ├── html_extractor.py    # HTML extractor
-    │   │   ├── json_extractor.py    # JSON extractor
-    │   │   ├── toml_extractor.py    # TOML extractor
-    │   │   └── yaml_extractor.py    # YAML extractor
-    │   │
-    │   ├── services/
-    │   │   ├── indexer.py           # IndexingService (orchestrator)
-    │   │   ├── resolver.py          # ReferenceResolver (deferred resolution)
-    │   │   ├── embedder.py          # EmbeddingService (Ollama)
-    │   │   ├── watcher.py           # FileWatcher (watchdog)
-    │   │   ├── file_event_router.py # Routes file events to handlers
-    │   │   ├── file_filter.py       # Include/exclude pattern matching
-    │   │   ├── pathing.py           # Path normalization
-    │   │   └── indexing/            # ★ Modular indexing pipeline (SRP)
-    │   │       ├── pipeline.py      # FileIndexingPipeline
-    │   │       ├── scanner.py       # RepositoryScanner
-    │   │       ├── language.py      # LanguageDetector
-    │   │       ├── text_builder.py  # EmbeddingTextBuilder
-    │   │       ├── stats_updater.py # RepositoryStatsUpdater
-    │   │       └── failure_policy.py# IndexFailurePolicy
-    │   │
-    │   ├── storage/
-    │   │   ├── factory.py           # ★ StorageBackendFactory
-    │   │   ├── state_db.py          # StateDB (SQLite — repos, files, queue)
-    │   │   ├── relation_graph.py    # RelationGraph (SQLite — entities, relations)
-    │   │   ├── vector_store.py      # VectorStore (LanceDB)
-    │   │   ├── neo4j_graph.py       # Neo4jRelationGraph (Neo4j backend)
-    │   │   ├── neo4j_vectors.py     # Neo4jVectorStore (Neo4j backend)
-    │   │   └── migrations/
-    │   │       └── v001_initial.py  # Initial schema migration
-    │   │
-    │   ├── tools/
-    │   │   ├── __init__.py          # register_all_tools()
-    │   │   ├── search.py            # search_code, find_symbol
-    │   │   ├── references.py        # get_symbol_references, find_usages
-    │   │   └── status.py            # get_index_status, reindex_repository
-    │   │
-    │   ├── prompts/                 # ★ MCP prompt workflows
-    │   │   ├── explore.py           # Code exploration prompt
-    │   │   ├── change_plan.py       # Change planning prompt
-    │   │   ├── impact.py            # Impact analysis prompt
-    │   │   └── safe_change.py       # Safe change validation prompt
-    │   │
-    │   └── utils/
-    │       ├── logging.py           # configure_logging()
-    │       ├── hashing.py           # File checksum utils
-    │       ├── paths.py             # GitignoreFilter
-    │       └── retry.py             # Retry utilities
-    │
-    └── tests/
-        ├── unit/                    # 858 unit tests
-        └── integration/             # Full pipeline + Neo4j tests
+├── pyproject.toml                   # Dependencies & tool config
+├── mise.toml                        # Task runner config
+├── src/mrcis/
+│   ├── __init__.py                  # Package version
+│   ├── __main__.py                  # CLI entry point (click)
+│   ├── errors.py                    # Exception hierarchy (MRCISError base)
+│   ├── server.py                    # FastMCP server with lifespan
+│   ├── server_runtime.py            # ServerRuntime lifecycle manager
+│   │
+│   ├── config/
+│   │   ├── models.py                # Pydantic config (incl. Neo4jConfig)
+│   │   ├── loader.py                # YAML config loading
+│   │   └── reconciler.py            # Config ↔ DB reconciliation
+│   │
+│   ├── models/
+│   │   ├── entities.py              # CodeEntity, ClassEntity, FunctionEntity, etc.
+│   │   ├── extraction.py            # ExtractionResult, EnumEntity, InterfaceEntity
+│   │   ├── relations.py             # CodeRelation, PendingReference
+│   │   ├── state.py                 # Repository, IndexedFile
+│   │   └── responses.py             # MCP tool response DTOs
+│   │
+│   ├── ports/                       # ★ Port interfaces (DIP)
+│   │   ├── db_session.py            # DbSessionPort
+│   │   ├── embedder.py              # EmbedderPort
+│   │   ├── extractors.py            # ExtractorPort, ExtractorRegistryPort
+│   │   ├── relation_graph.py        # RelationGraphPort
+│   │   ├── state.py                 # StatePort + segregated reader/writer ports (ISP)
+│   │   └── vector_store.py          # VectorStorePort
+│   │
+│   ├── extractors/                  # ★ Language extractors (OCP)
+│   │   ├── base.py                  # TreeSitterExtractor ABC + ExtractorProtocol
+│   │   ├── context.py               # ExtractionContext (parameter object)
+│   │   ├── registry.py              # ExtractorRegistry (factory)
+│   │   ├── defaults.py              # Default extractor factory
+│   │   ├── adapter.py               # LegacyExtractorAdapter (migration)
+│   │   ├── python.py                # Python extractor
+│   │   ├── typescript.py            # TypeScript extractor
+│   │   ├── javascript.py            # JavaScript extractor
+│   │   ├── go.py                    # Go extractor
+│   │   ├── rust.py                  # Rust extractor
+│   │   ├── java.py                  # Java extractor
+│   │   ├── kotlin.py                # Kotlin extractor
+│   │   ├── ruby.py                  # Ruby extractor
+│   │   ├── markdown.py              # Markdown extractor
+│   │   ├── dockerfile.py            # Dockerfile extractor
+│   │   ├── html_extractor.py        # HTML extractor
+│   │   ├── json_extractor.py        # JSON extractor
+│   │   ├── toml_extractor.py        # TOML extractor
+│   │   └── yaml_extractor.py        # YAML extractor
+│   │
+│   ├── services/
+│   │   ├── indexer.py               # IndexingService (orchestrator)
+│   │   ├── resolver.py              # ReferenceResolver (deferred resolution)
+│   │   ├── embedder.py              # EmbeddingService (Ollama)
+│   │   ├── watcher.py               # FileWatcher (watchdog)
+│   │   ├── file_event_router.py     # Routes file events to handlers
+│   │   ├── file_filter.py           # Include/exclude pattern matching
+│   │   ├── pathing.py               # Path normalization
+│   │   └── indexing/                # ★ Modular indexing pipeline (SRP)
+│   │       ├── pipeline.py          # FileIndexingPipeline
+│   │       ├── scanner.py           # RepositoryScanner
+│   │       ├── language.py          # LanguageDetector
+│   │       ├── text_builder.py      # EmbeddingTextBuilder
+│   │       ├── stats_updater.py     # RepositoryStatsUpdater
+│   │       └── failure_policy.py    # IndexFailurePolicy
+│   │
+│   ├── storage/
+│   │   ├── factory.py               # ★ StorageBackendFactory
+│   │   ├── state_db.py              # StateDB (SQLite — repos, files, queue)
+│   │   ├── relation_graph.py        # RelationGraph (SQLite — entities, relations)
+│   │   ├── vector_store.py          # VectorStore (LanceDB)
+│   │   ├── neo4j_graph.py           # Neo4jRelationGraph (Neo4j backend)
+│   │   ├── neo4j_vectors.py         # Neo4jVectorStore (Neo4j backend)
+│   │   └── migrations/
+│   │       └── v001_initial.py      # Initial schema migration
+│   │
+│   ├── tools/
+│   │   ├── __init__.py              # register_all_tools()
+│   │   ├── search.py                # search_code, find_symbol
+│   │   ├── references.py            # get_symbol_references, find_usages
+│   │   └── status.py                # get_index_status, reindex_repository
+│   │
+│   ├── prompts/                     # ★ MCP prompt workflows
+│   │   ├── explore.py               # Code exploration prompt
+│   │   ├── change_plan.py           # Change planning prompt
+│   │   ├── impact.py                # Impact analysis prompt
+│   │   └── safe_change.py           # Safe change validation prompt
+│   │
+│   └── utils/
+│       ├── logging.py               # configure_logging()
+│       ├── hashing.py               # File checksum utils
+│       ├── paths.py                 # GitignoreFilter
+│       └── retry.py                 # Retry utilities
+│
+└── tests/
+    ├── unit/                        # 858 unit tests
+    └── integration/                 # Full pipeline + Neo4j tests
 ```
 
 ---
@@ -336,7 +335,6 @@ The pipeline is decomposed into SRP modules under `services/indexing/`. Identify
 ### Initial Setup
 
 ```bash
-cd mrcis
 uv sync --dev                    # Install all dependencies
 ```
 
@@ -350,8 +348,6 @@ ollama pull mxbai-embed-large    # Pull default embedding model
 ### Running Tests
 
 ```bash
-cd mrcis
-
 # Direct pytest commands
 uv run pytest tests/unit/ -v              # Unit tests only
 uv run pytest tests/ -v                   # All tests
@@ -368,8 +364,6 @@ mise run test-cov                # With coverage report
 ### Code Quality
 
 ```bash
-cd mrcis
-
 # Individual checks
 uv run ruff check src/ tests/   # Lint
 uv run ruff format src/ tests/  # Format
@@ -385,8 +379,6 @@ mise run pre-commit              # Full check + test suite
 ### Running the Server
 
 ```bash
-cd mrcis
-
 # Initialize database first
 uv run mrcis init --config config.yaml
 
@@ -582,4 +574,4 @@ MRCIS_NEO4J__URI="bolt://localhost:7687"
 - [`TECHNICAL_DESIGN.md`](./TECHNICAL_DESIGN.md) — Technical specifications
 - [`RECONCILIATION_PLAN.md`](./RECONCILIATION_PLAN.md) — Design evolution tracking
 - [`docs/plans/`](./docs/plans/) — Phase-by-phase implementation guides
-- [`mrcis/README.md`](./mrcis/README.md) — Quick start and user-facing docs
+- [`README.md`](./README.md) — Quick start and user-facing docs

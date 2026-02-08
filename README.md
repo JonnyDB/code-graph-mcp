@@ -78,14 +78,7 @@ ollama serve              # Start the server
 ollama pull mxbai-embed-large
 ```
 
-### 2. Install dependencies
-
-```bash
-cd mrcis
-uv sync --dev
-```
-
-### 3. Create a config file
+### 2. Create a config file
 
 Create `config.yaml`:
 
@@ -109,9 +102,17 @@ logging:
   level: INFO
 ```
 
-### 4. Initialize and start
+### 3. Run with uvx (no install required)
 
 ```bash
+uvx --from 'git+https://github.com/JonnyDB/code-graph-mcp@main' mrcis init --config config.yaml
+uvx --from 'git+https://github.com/JonnyDB/code-graph-mcp@main' mrcis serve --config config.yaml
+```
+
+Or install and run with uv:
+
+```bash
+uv sync --dev
 uv run mrcis init --config config.yaml
 uv run mrcis serve --config config.yaml
 ```
@@ -123,7 +124,6 @@ The server starts indexing your repositories immediately on startup.
 For large codebases or complex cross-repository analysis, switch to the Neo4j backend:
 
 ```bash
-cd mrcis
 docker compose up -d   # Start Neo4j (bolt://localhost:7687, UI at http://localhost:7474)
 ```
 
@@ -172,8 +172,22 @@ Add to your `claude_desktop_config.json`:
 {
   "mcpServers": {
     "mrcis": {
+      "command": "uvx",
+      "args": ["--from", "git+https://github.com/JonnyDB/code-graph-mcp@main", "mrcis", "serve", "--config", "/path/to/config.yaml"],
+      "env": {}
+    }
+  }
+}
+```
+
+Or if running from a local clone:
+
+```json
+{
+  "mcpServers": {
+    "mrcis": {
       "command": "uv",
-      "args": ["--directory", "/path/to/mrcis", "run", "mrcis", "serve", "--config", "/path/to/config.yaml"],
+      "args": ["--directory", "/path/to/code-graph-mcp", "run", "mrcis", "serve", "--config", "/path/to/config.yaml"],
       "env": {}
     }
   }
@@ -183,8 +197,13 @@ Add to your `claude_desktop_config.json`:
 ## CLI Reference
 
 ```bash
-uv run mrcis serve    [--config FILE] [--transport stdio|sse]  # Start MCP server
-uv run mrcis init     [--config FILE]                          # Initialize database
+# Via uvx (no install required)
+uvx --from 'git+https://github.com/JonnyDB/code-graph-mcp@main' mrcis serve [--config FILE] [--transport stdio|sse]
+uvx --from 'git+https://github.com/JonnyDB/code-graph-mcp@main' mrcis init  [--config FILE]
+
+# Via uv (from local clone)
+uv run mrcis serve    [--config FILE] [--transport stdio|sse]
+uv run mrcis init     [--config FILE]
 ```
 
 ## Configuration
@@ -209,7 +228,6 @@ ollama pull mxbai-embed-large   # Default/recommended — dimensions: 1024
 ## Development
 
 ```bash
-cd mrcis
 uv sync --dev                             # Install dependencies
 uv run pytest tests/unit/ -v              # Run unit tests
 uv run pytest tests/ -v                   # Run all tests

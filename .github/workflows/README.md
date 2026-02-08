@@ -156,7 +156,6 @@ To enable PyPI publishing:
 ### Install pre-commit hooks
 
 ```bash
-cd mrcis
 uv sync --dev
 mise run pre-commit-install
 ```

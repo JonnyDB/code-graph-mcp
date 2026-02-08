@@ -255,7 +255,6 @@ class TestMyBackendRelationGraph:
 ### Step 6: Verify
 
 ```bash
-cd mrcis
 uv run pytest tests/unit/storage/test_my_backend*.py -v
 uv run ruff check src/mrcis/storage/my_backend*.py
 uv run mypy src/mrcis/storage/my_backend*.py

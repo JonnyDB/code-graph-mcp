@@ -17,13 +17,13 @@ jobs:
     if: github.repository_owner == 'JonnyDB'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           persist-credentials: false
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v4
+        uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
 
@@ -31,11 +31,9 @@ jobs:
         run: uv python install 3.11
 
       - name: Install dependencies
-        working-directory: mrcis
         run: uv sync --dev
 
       - name: Verify tests pass
-        working-directory: mrcis
         run: uv run pytest tests/ -v -m "not slow and not integration"
 
       - name: Setup Node.js
@@ -69,23 +67,21 @@ jobs:
     if: needs.release.outputs.new_release_published == 'true'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: main
           fetch-depth: 0
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v4
+        uses: astral-sh/setup-uv@v7
 
       - name: Set up Python
         run: uv python install 3.11
 
       - name: Build package
-        working-directory: mrcis
         run: uv build
 
       - name: Publish to PyPI
-        working-directory: mrcis
         env:
           UV_PUBLISH_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
         run: uv publish

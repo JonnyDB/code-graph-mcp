@@ -83,7 +83,7 @@ neo4j:
 # List of repositories to index. Each repository is independently tracked.
 repositories:
     # Unique name used to identify this repository in search results and CLI
-- name: rag-indexing
+- name: code-graph-mcp
     # Path to the repository root ("." for current directory)
   path: .
     # Git branch to index
