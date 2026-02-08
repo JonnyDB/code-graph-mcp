@@ -149,6 +149,7 @@ class TestRepoStatsUpdate:
         self,
         indexing_service: IndexingService,
         mock_state_db: AsyncMock,
+        mock_relation_graph: AsyncMock,
         mock_extractor_registry: MagicMock,
         repo_config: RepositoryConfig,
     ) -> None:
@@ -187,20 +188,24 @@ class TestRepoStatsUpdate:
         mock_extractor.extract_with_context.return_value = mock_result
         mock_extractor_registry.get_extractor.return_value = mock_extractor
 
-        # Set up count methods
+        # Set up count methods on state_db (file/pending counts)
         mock_state_db.count_indexed_files = AsyncMock(return_value=10)
-        mock_state_db.count_entities = AsyncMock(return_value=50)
-        mock_state_db.count_relations = AsyncMock(return_value=20)
         mock_state_db.count_pending_files = AsyncMock(return_value=0)
         mock_state_db.update_repository_stats = AsyncMock()
 
+        # Set up count methods on relation_graph (entity/relation counts)
+        mock_relation_graph.count_entities = AsyncMock(return_value=50)
+        mock_relation_graph.count_relations = AsyncMock(return_value=20)
+
         await indexing_service._process_file(file)
 
-        # Verify stats were queried with the correct repo_id
+        # Verify file/pending counts were queried from state_db
         mock_state_db.count_indexed_files.assert_called_once_with(repo_id)
-        mock_state_db.count_entities.assert_called_once_with(repo_id)
-        mock_state_db.count_relations.assert_called_once_with(repo_id)
         mock_state_db.count_pending_files.assert_called_once_with(repo_id)
+
+        # Verify entity/relation counts were queried from relation_graph
+        mock_relation_graph.count_entities.assert_called_once_with(repo_id)
+        mock_relation_graph.count_relations.assert_called_once_with(repo_id)
 
         # Verify update_repository_stats was called with live counts,
         # last_indexed_at, and status transition to "watching" (no pending files)
@@ -217,6 +222,7 @@ class TestRepoStatsUpdate:
         self,
         indexing_service: IndexingService,
         mock_state_db: AsyncMock,
+        mock_relation_graph: AsyncMock,
         mock_extractor_registry: MagicMock,
         repo_config: RepositoryConfig,
     ) -> None:
@@ -254,10 +260,10 @@ class TestRepoStatsUpdate:
         mock_extractor_registry.get_extractor.return_value = mock_extractor
 
         mock_state_db.count_indexed_files = AsyncMock(return_value=5)
-        mock_state_db.count_entities = AsyncMock(return_value=25)
-        mock_state_db.count_relations = AsyncMock(return_value=10)
         mock_state_db.count_pending_files = AsyncMock(return_value=0)
         mock_state_db.update_repository_stats = AsyncMock()
+        mock_relation_graph.count_entities = AsyncMock(return_value=25)
+        mock_relation_graph.count_relations = AsyncMock(return_value=10)
 
         # Track call order
         call_order: list[str] = []
@@ -437,7 +443,7 @@ class TestPostIndexResolution:
         test_file.write_text("# test")
 
         # Set count_relations to return 5 after resolution
-        mock_state_db.count_relations.return_value = 5
+        mock_relation_graph.count_relations.return_value = 5
 
         await service._process_file(file)
 

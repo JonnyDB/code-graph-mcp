@@ -230,6 +230,23 @@ class RelationGraph:
             cursor = await self._db.execute("DELETE FROM entities WHERE file_id = ?", [file_id])
         return int(cursor.rowcount)
 
+    async def count_entities(self, repo_id: str) -> int:
+        """Count entities for a repository."""
+        row = await self._db.fetchone(
+            "SELECT COUNT(*) as cnt FROM entities WHERE repository_id = ?",
+            [repo_id],
+        )
+        return row["cnt"] if row else 0
+
+    async def count_relations(self, repo_id: str) -> int:
+        """Count relations for a repository (as source or target)."""
+        row = await self._db.fetchone(
+            "SELECT COUNT(*) as cnt FROM relations"
+            " WHERE source_repository_id = ? OR target_repository_id = ?",
+            [repo_id, repo_id],
+        )
+        return row["cnt"] if row else 0
+
     async def update_entity_vector_id(self, entity_id: str, vector_id: str) -> None:
         """Update entity with vector store ID."""
         async with self._db.transaction():

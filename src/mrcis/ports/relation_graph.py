@@ -102,6 +102,14 @@ class RelationGraphPort(Protocol):
         """Mark a reference as resolved and create relation to target."""
         ...
 
+    async def count_entities(self, repo_id: str) -> int:
+        """Count entities in a repository."""
+        ...
+
+    async def count_relations(self, repo_id: str) -> int:
+        """Count relations in a repository (as source or target)."""
+        ...
+
     async def mark_reference_unresolved(self, ref_id: str | UUID, max_attempts: int = 3) -> None:
         """Increment attempts for a reference, mark as failed if max reached."""
         ...

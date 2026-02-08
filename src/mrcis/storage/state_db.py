@@ -601,23 +601,6 @@ class StateDB:
         )
         return row["cnt"] if row else 0
 
-    async def count_entities(self, repo_id: str) -> int:
-        """Count entities for a repository."""
-        row = await self.fetchone(
-            "SELECT COUNT(*) as cnt FROM entities WHERE repository_id = ?",
-            [repo_id],
-        )
-        return row["cnt"] if row else 0
-
-    async def count_relations(self, repo_id: str) -> int:
-        """Count relations for a repository (as source or target)."""
-        row = await self.fetchone(
-            "SELECT COUNT(*) as cnt FROM relations"
-            " WHERE source_repository_id = ? OR target_repository_id = ?",
-            [repo_id, repo_id],
-        )
-        return row["cnt"] if row else 0
-
     async def get_queue_length(self) -> int:
         """Get number of files in queue."""
         row = await self.fetchone("SELECT COUNT(*) as cnt FROM indexing_queue")

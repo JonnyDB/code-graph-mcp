@@ -12,13 +12,13 @@ from mrcis.models.responses import (
 )
 
 if TYPE_CHECKING:
-    from mrcis.ports import RepositoryReaderPort, StatePort
+    from mrcis.ports import RelationGraphPort, RepositoryReaderPort, StatePort
 
 
 async def get_index_status(
     state_db: "RepositoryReaderPort",
     repository: str | None = None,
-    relation_graph: Any = None,  # noqa: ARG001
+    relation_graph: "RelationGraphPort | None" = None,
     is_writer: bool = True,
 ) -> IndexStatusResponse:
     """
@@ -27,7 +27,7 @@ async def get_index_status(
     Args:
         state_db: StateDB instance.
         repository: Optional repository name to filter.
-        relation_graph: Optional RelationGraph instance (reserved for future use).
+        relation_graph: RelationGraph instance for entity/relation counts.
 
     Returns:
         IndexStatusResponse with status information.
@@ -57,8 +57,8 @@ async def get_index_status(
         pending = await state_db.count_pending_files(repo_id)
         failed = await state_db.count_failed_files(repo_id)
         file_count = await state_db.count_indexed_files(repo_id)
-        entity_count = await state_db.count_entities(repo_id)
-        relation_count = await state_db.count_relations(repo_id)
+        entity_count = await relation_graph.count_entities(repo_id) if relation_graph else 0
+        relation_count = await relation_graph.count_relations(repo_id) if relation_graph else 0
 
         statuses.append(
             IndexStatus(

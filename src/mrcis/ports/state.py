@@ -37,14 +37,6 @@ class RepositoryReaderPort(Protocol):
         """Count indexed files for a repository."""
         ...
 
-    async def count_entities(self, repo_id: str) -> int:
-        """Count entities in a repository."""
-        ...
-
-    async def count_relations(self, repo_id: str) -> int:
-        """Count relations in a repository."""
-        ...
-
 
 class RepositoryWriterPort(Protocol):
     """Protocol for writing repository state."""

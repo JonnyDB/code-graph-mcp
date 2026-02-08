@@ -18,15 +18,16 @@ def mock_state_db() -> AsyncMock:
     db.count_pending_files = AsyncMock(return_value=0)
     db.count_failed_files = AsyncMock(return_value=0)
     db.count_indexed_files = AsyncMock(return_value=0)
-    db.count_entities = AsyncMock(return_value=0)
-    db.count_relations = AsyncMock(return_value=0)
     return db
 
 
 @pytest.fixture
 def mock_relation_graph() -> AsyncMock:
     """Create mock relation graph."""
-    return AsyncMock()
+    rg = AsyncMock()
+    rg.count_entities = AsyncMock(return_value=0)
+    rg.count_relations = AsyncMock(return_value=0)
+    return rg
 
 
 @pytest.fixture
@@ -71,8 +72,8 @@ class TestGetIndexStatus:
         mock_state_db.count_pending_files.return_value = 5
         mock_state_db.count_failed_files.return_value = 2
         mock_state_db.count_indexed_files.return_value = 100
-        mock_state_db.count_entities.return_value = 500
-        mock_state_db.count_relations.return_value = 200
+        mock_relation_graph.count_entities.return_value = 500
+        mock_relation_graph.count_relations.return_value = 200
 
         result = await get_index_status(state_db=mock_state_db, relation_graph=mock_relation_graph)
 
@@ -107,8 +108,8 @@ class TestGetIndexStatus:
         mock_state_db.count_failed_files.return_value = 0
         # Live counts differ from stale repo attributes
         mock_state_db.count_indexed_files.return_value = 42
-        mock_state_db.count_entities.return_value = 123
-        mock_state_db.count_relations.return_value = 77
+        mock_relation_graph.count_entities.return_value = 123
+        mock_relation_graph.count_relations.return_value = 77
 
         result = await get_index_status(state_db=mock_state_db, relation_graph=mock_relation_graph)
 
@@ -139,8 +140,8 @@ class TestGetIndexStatus:
         mock_state_db.count_pending_files.return_value = 0
         mock_state_db.count_failed_files.return_value = 0
         mock_state_db.count_indexed_files.return_value = 100
-        mock_state_db.count_entities.return_value = 500
-        mock_state_db.count_relations.return_value = 200
+        mock_relation_graph.count_entities.return_value = 500
+        mock_relation_graph.count_relations.return_value = 200
 
         await get_index_status(
             state_db=mock_state_db,

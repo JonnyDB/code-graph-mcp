@@ -78,7 +78,7 @@ build-backend = "hatchling.build"
 packages = ["src/mrcis"]
 
 [tool.ruff]
-target-version = "1.0.0"
+target-version = "py311"
 line-length = 100
 src = ["src", "tests"]
 
@@ -117,7 +117,7 @@ ignore = [
 known-first-party = ["mrcis"]
 
 [tool.mypy]
-python_version = "1.0.0"
+python_version = "3.11"
 strict = true
 warn_return_any = true
 warn_unused_ignores = false

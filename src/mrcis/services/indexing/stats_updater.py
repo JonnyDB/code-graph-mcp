@@ -7,7 +7,7 @@ from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from mrcis.ports import IndexingStatePort
+    from mrcis.ports import IndexingStatePort, RelationGraphPort
 
 
 class RepositoryStatsUpdater:
@@ -17,13 +17,15 @@ class RepositoryStatsUpdater:
     statistics after file indexing and reference resolution events.
     """
 
-    def __init__(self, state_db: "IndexingStatePort") -> None:
+    def __init__(self, state_db: "IndexingStatePort", relation_graph: "RelationGraphPort") -> None:
         """Initialize stats updater.
 
         Args:
-            state_db: State database port for querying counts and updating stats.
+            state_db: State database port for querying file counts and updating stats.
+            relation_graph: Relation graph port for querying entity/relation counts.
         """
         self.state_db = state_db
+        self.relation_graph = relation_graph
 
     async def update_after_file_indexed(self, repo_id: str) -> None:
         """Update repository statistics after a file has been indexed.
@@ -37,8 +39,8 @@ class RepositoryStatsUpdater:
         """
         # Query all current counts
         file_count = await self.state_db.count_indexed_files(repo_id)
-        entity_count = await self.state_db.count_entities(repo_id)
-        relation_count = await self.state_db.count_relations(repo_id)
+        entity_count = await self.relation_graph.count_entities(repo_id)
+        relation_count = await self.relation_graph.count_relations(repo_id)
         pending_count = await self.state_db.count_pending_files(repo_id)
 
         # Transition to "watching" when no more pending files
@@ -65,7 +67,7 @@ class RepositoryStatsUpdater:
             repo_id: Repository ID to update.
         """
         # Re-query relation count after resolution
-        relation_count = await self.state_db.count_relations(repo_id)
+        relation_count = await self.relation_graph.count_relations(repo_id)
 
         # Update only relation count
         await self.state_db.update_repository_stats(

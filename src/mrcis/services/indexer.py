@@ -76,7 +76,7 @@ class IndexingService:
         )
         self.language_detector = LanguageDetector()
         self.failure_policy = IndexFailurePolicy(max_retries=indexing_config.max_retries)
-        self.stats_updater = RepositoryStatsUpdater(state_db)
+        self.stats_updater = RepositoryStatsUpdater(state_db, relation_graph)
 
         self._shutdown_event = asyncio.Event()
         self._current_file: str | None = None

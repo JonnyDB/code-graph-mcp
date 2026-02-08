@@ -284,6 +284,29 @@ class Neo4jRelationGraph:
             record = await result.single()
             return record["deleted"] if record else 0
 
+    async def count_entities(self, repo_id: str) -> int:
+        """Count entities for a repository."""
+        async with self._session() as session:
+            result = await session.run(
+                "MATCH (e:Entity {repository_id: $repo_id}) RETURN count(e) AS cnt",
+                {"repo_id": repo_id},
+            )
+            record = await result.single()
+            return record["cnt"] if record else 0
+
+    async def count_relations(self, repo_id: str) -> int:
+        """Count relations for a repository (as source or target)."""
+        async with self._session() as session:
+            result = await session.run(
+                "MATCH ()-[r:RELATES_TO]->() "
+                "WHERE r.source_repository_id = $repo_id "
+                "OR r.target_repository_id = $repo_id "
+                "RETURN count(r) AS cnt",
+                {"repo_id": repo_id},
+            )
+            record = await result.single()
+            return record["cnt"] if record else 0
+
     async def update_entity_vector_id(self, entity_id: str, vector_id: str) -> None:
         """Update entity with vector store ID."""
         async with self._session() as session:
