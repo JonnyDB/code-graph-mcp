@@ -1,0 +1,183 @@
+# =============================================================================
+# MRCIS Configuration
+# Multi-Repository Code Intelligence System
+#
+# All settings can be overridden via environment variables using the MRCIS_
+# prefix with __ as a nested delimiter. For example:
+#   MRCIS_EMBEDDING__API_URL=http://localhost:1234/v1
+#   MRCIS_LOGGING__LEVEL=DEBUG
+# =============================================================================
+
+# --- MCP Server ---
+server:
+  # Transport protocol: "stdio" for CLI tools (Claude Desktop, Claude Code),
+  # "sse" for web clients
+  transport: sse
+  # Host to bind to when using SSE transport
+  host: 127.0.0.1
+  # Port to bind to when using SSE transport (1024-65535)
+  port: 8765
+  # Seconds to wait for graceful shutdown (5-300)
+  shutdown_timeout_seconds: 30
+
+# --- Embedding Model ---
+embedding:
+  # Embedding provider type (currently only "openai_compatible" is supported)
+  provider: openai_compatible
+  # Base URL for the OpenAI-compatible embedding API
+  # LM Studio: http://localhost:1234/v1
+  # Ollama:    http://localhost:11434/v1
+  api_url: http://localhost:1234/v1
+  # API key for authentication ("lm-studio" or "ollama" for local servers)
+  api_key: lm-studio
+  # Model name as recognized by the embedding server
+  model: text-embedding-qwen3-embedding-4b
+  # Vector dimensions output by the model (64-4096)
+  dimensions: 2560
+  # Number of texts to embed per API call (1-1000)
+  batch_size: 100
+  # Timeout in seconds for each embedding API request (5-300)
+  timeout_seconds: 30.0
+
+# --- Storage ---
+# MRCIS supports two storage backends:
+#   - "sqlite_lancedb": SQLite for state + LanceDB for vectors (default, zero setup)
+#   - "neo4j": Neo4j for everything (requires Docker or Neo4j server)
+storage:
+  # Backend to use: "sqlite_lancedb" or "neo4j"
+  backend: sqlite_lancedb
+  # Directory where SQLite database and LanceDB vectors are stored
+  # Relative paths are resolved from the working directory
+  data_directory: .mrcis
+  # Name of the LanceDB table for vector embeddings (sqlite_lancedb backend only)
+  vector_table_name: code_vectors
+  # Name of the SQLite database file for state, entities, and relations
+  state_db_name: state.db
+
+# --- Neo4j Configuration ---
+# Only used when storage.backend is set to "neo4j"
+# Start Neo4j with: docker compose up -d
+# Default credentials match docker-compose.yml defaults
+neo4j:
+  # Neo4j Bolt connection URI
+  # Schemes: bolt://, bolt+s://, neo4j://, neo4j+s://
+  uri: bolt://localhost:7687
+  # Neo4j username
+  username: neo4j
+  # Neo4j password (default matches docker-compose.yml)
+  password: mrcis1234!
+  # Neo4j database name
+  database: neo4j
+  # Maximum connections in the pool (1-500)
+  max_connection_pool_size: 50
+  # Connection timeout in seconds (5-300)
+  connection_timeout_seconds: 30.0
+  # Vector dimensions for Neo4j vector index (must match embedding.dimensions)
+  vector_dimensions: 2560
+  # Name of the Neo4j vector index
+  vector_index_name: code_vectors
+  # Similarity function: "cosine" or "euclidean"
+  vector_similarity_function: cosine
+
+# --- Repositories ---
+# List of repositories to index. Each repository is independently tracked.
+repositories:
+    # Unique name used to identify this repository in search results and CLI
+- name: rag-indexing
+    # Path to the repository root ("." for current directory)
+  path: .
+    # Git branch to index
+  branch: main
+    # Other repository names this one depends on (for cross-repo resolution)
+  depends_on: []
+    # Per-repo file include overrides (null = use global files.include_patterns)
+  include_patterns:
+    # Per-repo file exclude overrides (null = use global files.exclude_patterns)
+  exclude_patterns:
+
+# --- File Filtering ---
+# Controls which files are discovered and indexed across all repositories.
+files:
+  # Glob patterns for files to include in indexing
+  include_patterns:
+    # Programming languages
+  - "**/*.py"
+  - "**/*.ts"
+  - "**/*.tsx"
+  - "**/*.js"
+  - "**/*.jsx"
+  - "**/*.go"
+  - "**/*.rs"
+  - "**/*.rb"
+  - "**/*.java"
+  - "**/*.kt"
+    # Configuration files
+  - "**/*.json"
+  - "**/*.yaml"
+  - "**/*.yml"
+  - "**/*.toml"
+    # Markup and documentation
+  - "**/*.html"
+  - "**/*.htm"
+  - "**/*.xml"
+  - "**/*.md"
+  - "**/*.markdown"
+    # Templating
+  - "**/*.erb"
+    # Docker
+  - "**/Dockerfile"
+  - "**/Dockerfile.*"
+  - "**/docker-compose.yml"
+  - "**/docker-compose.yaml"
+  - "**/docker-compose.*.yml"
+  - "**/docker-compose.*.yaml"
+  # Glob patterns for files/directories to exclude from indexing
+  exclude_patterns:
+  - "**/node_modules/**"
+  - "**/.git/**"
+  - "**/dist/**"
+  - "**/build/**"
+  - "**/__pycache__/**"
+  - "**/.venv/**"
+  - "**/vendor/**"
+  # Whether to honor .gitignore rules when discovering files
+  respect_gitignore: true
+  # Maximum file size in KB to index; larger files are skipped (1-10240)
+  max_file_size_kb: 1024
+
+# --- AST Parser ---
+parser:
+  # Maximum characters per code chunk sent for embedding (500-32000)
+  max_chunk_chars: 4000
+  # Overlap between adjacent chunks to preserve context (0-1000, must be < max_chunk_chars)
+  chunk_overlap_chars: 200
+  # Whether to extract docstrings from functions/classes as separate metadata
+  extract_docstrings: true
+  # Whether to extract inline comments as separate metadata
+  extract_comments: false
+
+# --- Indexing Behavior ---
+indexing:
+  # Number of files to process per indexing batch (1-500)
+  batch_size: 50
+  # Maximum retry attempts for a file that fails indexing (1-10)
+  max_retries: 3
+  # Seconds to wait between retry attempts (1-60)
+  retry_delay_seconds: 5.0
+  # Seconds between cross-repo pending reference resolution passes (10-600)
+  resolution_interval_seconds: 60
+  # Milliseconds to debounce file watcher events before triggering reindex (100-5000)
+  watch_debounce_ms: 500
+
+# --- Logging ---
+logging:
+  # Log level: DEBUG, INFO, WARNING, ERROR
+  level: INFO
+  # Output format: "console" for human-readable, "json" for structured logging
+  format: console
+  # Optional file path to write logs to (null = stdout only)
+  file:
+  # Log file rotation threshold (e.g. "10 MB", "1 day")
+  rotation: 10 MB
+  # How long to keep rotated log files (e.g. "7 days", "3 months")
+  retention: 7 days

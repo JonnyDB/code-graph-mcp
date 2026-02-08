@@ -1,0 +1,128 @@
+[env]
+PYTHONDONTWRITEBYTECODE = "1"
+
+# =============================================================================
+# Service
+# =============================================================================
+
+[tasks.serve]
+description = "Start the MCP server (SSE transport)"
+run = "uv run mrcis serve --config config.yaml --transport sse"
+
+[tasks.serve-stdio]
+description = "Start the MCP server (stdio transport)"
+run = "uv run mrcis serve --config config.yaml --transport stdio"
+
+[tasks.init]
+description = "Initialize the database and verify config"
+run = "uv run mrcis init --config config.yaml"
+
+[tasks.status]
+description = "Show index status for all repositories"
+run = "uv run mrcis status --config config.yaml"
+
+[tasks.reindex]
+description = "Queue a repository for reindexing"
+usage = "reindex <REPOSITORY>"
+run = "uv run mrcis reindex {{arg(name=\"repo\")}} --config config.yaml"
+
+[tasks.reindex-force]
+description = "Force-reindex a repository (reset failures)"
+usage = "reindex-force <REPOSITORY>"
+run = "uv run mrcis reindex {{arg(name=\"repo\")}} --config config.yaml --force"
+
+# =============================================================================
+# Testing
+# =============================================================================
+
+[tasks.test]
+description = "Run all tests"
+run = "uv run pytest tests/ -v"
+
+[tasks.test-unit]
+description = "Run unit tests only"
+run = "uv run pytest tests/unit/ -v"
+
+[tasks.test-integration]
+description = "Run integration tests only"
+run = "uv run pytest tests/integration/ -v"
+
+[tasks.test-fast]
+description = "Run tests without slow tests"
+run = "uv run pytest tests/ -v -m 'not slow'"
+
+[tasks.test-cov]
+description = "Run tests with coverage"
+run = "uv run pytest tests/ -v --cov=src/mrcis --cov-report=term-missing --cov-report=html"
+
+[tasks.test-x]
+description = "Run tests, stop on first failure"
+run = "uv run pytest tests/ -x"
+
+# =============================================================================
+# Code Quality
+# =============================================================================
+
+[tasks.lint]
+description = "Run linter (ruff check)"
+run = "uv run ruff check src/ tests/"
+
+[tasks.lint-fix]
+description = "Run linter and fix issues"
+run = "uv run ruff check --fix src/ tests/"
+
+[tasks.format]
+description = "Format code with ruff"
+run = "uv run ruff format src/ tests/"
+
+[tasks.format-check]
+description = "Check code formatting"
+run = "uv run ruff format --check src/ tests/"
+
+[tasks.typecheck]
+description = "Run type checker (mypy)"
+run = "uv run mypy src/"
+
+[tasks.check]
+description = "Run all checks (lint, format, typecheck)"
+depends = ["lint", "format-check", "typecheck"]
+
+[tasks.fix]
+description = "Fix all auto-fixable issues"
+depends = ["lint-fix", "format"]
+
+[tasks.pre-commit]
+description = "Run all checks and unit tests"
+depends = ["fix", "test-unit"]
+
+# =============================================================================
+# Pre-commit
+# =============================================================================
+
+[tasks.pre-commit-install]
+description = "Install pre-commit hooks"
+run = "uv run pre-commit install --install-hooks && uv run pre-commit install --hook-type commit-msg"
+
+[tasks.pre-commit-run]
+description = "Run pre-commit on all files"
+run = "uv run pre-commit run --all-files"
+
+[tasks.pre-commit-update]
+description = "Update pre-commit hooks to latest versions"
+run = "uv run pre-commit autoupdate"
+
+# =============================================================================
+# Housekeeping
+# =============================================================================
+
+[tasks.clean]
+description = "Remove build artifacts"
+run = """
+rm -rf .pytest_cache .mypy_cache .ruff_cache htmlcov .coverage
+rm -rf dist build *.egg-info
+find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
+"""
+
+[tasks.clean-data]
+description = "Remove local MRCIS data (SQLite + vectors)"
+run = "rm -rf .mrcis"

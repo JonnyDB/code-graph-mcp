@@ -1,0 +1,33 @@
+# Docker Compose for MRCIS Neo4j backend
+# Usage:
+#   docker compose up -d        # Start Neo4j
+#   docker compose down         # Stop Neo4j
+#   docker compose down -v      # Stop and remove data
+
+services:
+  neo4j:
+    image: neo4j:5.26-community
+    container_name: mrcis-neo4j
+    ports:
+    - "${NEO4J_BOLT_PORT:-7687}:7687"
+    - "${NEO4J_HTTP_PORT:-7474}:7474"
+    environment:
+      NEO4J_AUTH: "${NEO4J_USERNAME:-neo4j}/${NEO4J_PASSWORD:-mrcis1234!}"
+      NEO4J_PLUGINS: '[]'
+      NEO4J_server_memory_heap_initial__size: "${NEO4J_HEAP_INITIAL:-256m}"
+      NEO4J_server_memory_heap_max__size: "${NEO4J_HEAP_MAX:-2g}"
+      NEO4J_server_memory_pagecache_size: "${NEO4J_PAGECACHE:-512m}"
+    volumes:
+    - neo4j_data:/data
+    - neo4j_logs:/logs
+    healthcheck:
+      test: ["CMD", "cypher-shell", "-u", "${NEO4J_USERNAME:-neo4j}", "-p", "${NEO4J_PASSWORD:-mrcis1234!}", "RETURN 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+volumes:
+  neo4j_data:
+  neo4j_logs:

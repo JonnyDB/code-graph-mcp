@@ -1,0 +1,79 @@
+# Pre-commit hooks configuration for MRCIS
+# See https://pre-commit.com for more information
+
+default_install_hook_types: [pre-commit, commit-msg]
+default_stages: [pre-commit]
+
+repos:
+  # Ruff - Fast Python linter and formatter
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: v0.8.4
+  hooks:
+      # Run the linter
+  - id: ruff
+    args: [--fix]
+    types_or: [python, pyi]
+      # Run the formatter
+  - id: ruff-format
+    types_or: [python, pyi]
+
+  # Mypy - Type checking via uv
+- repo: local
+  hooks:
+  - id: mypy
+    name: mypy
+    entry: uv run mypy
+    language: system
+    types: [python]
+    require_serial: true
+    pass_filenames: false
+    args: [mrcis/src/]
+
+  # Pytest - Run fast tests only (skip slow/integration)
+- repo: local
+  hooks:
+  - id: pytest-fast
+    name: pytest (fast tests)
+    entry: uv run pytest
+    language: system
+    types: [python]
+    pass_filenames: false
+    args: [mrcis/tests/, -v, -m, "not slow and not integration", --tb=short]
+
+  # Conventional Commits - Enforce commit message format
+- repo: https://github.com/compilerla/conventional-pre-commit
+  rev: v3.6.0
+  hooks:
+  - id: conventional-pre-commit
+    stages: [commit-msg]
+    args: []      # Optional: can customize allowed types
+
+  # Standard pre-commit hooks
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v5.0.0
+  hooks:
+  - id: trailing-whitespace
+    exclude: ^tests/fixtures/
+  - id: end-of-file-fixer
+    exclude: ^tests/fixtures/
+  - id: check-yaml
+    args: [--unsafe]      # Allow custom YAML tags
+  - id: check-toml
+  - id: check-added-large-files
+    args: [--maxkb=1000]
+  - id: check-merge-conflict
+  - id: check-case-conflict
+  - id: mixed-line-ending
+    args: [--fix=lf]
+
+  # YAML formatting
+- repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
+  rev: v2.14.0
+  hooks:
+  - id: pretty-format-yaml
+    args: [--autofix, --indent, '2', --preserve-quotes]
+    exclude: ^\.github/workflows/
+
+# Global settings
+fail_fast: false
+minimum_pre_commit_version: '2.20.0'
