@@ -1,0 +1,99 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  test:
+    name: Test Python ${{ matrix.python-version }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python-version: ["3.11", "3.12"]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Set up Python ${{ matrix.python-version }}
+        run: uv python install ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        working-directory: mrcis
+        run: uv sync --dev
+
+      - name: Run linter (ruff)
+        working-directory: mrcis
+        run: uv run ruff check src/ tests/
+
+      - name: Check formatting (ruff)
+        working-directory: mrcis
+        run: uv run ruff format --check src/ tests/
+
+      - name: Run type checker (mypy)
+        working-directory: mrcis
+        run: uv run mypy src/
+
+      - name: Run tests (fast)
+        working-directory: mrcis
+        run: uv run pytest tests/ -v -m "not slow and not integration" --tb=short
+
+      - name: Run tests with coverage
+        if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11'
+        working-directory: mrcis
+        run: uv run pytest tests/ --cov=src/mrcis --cov-report=xml --cov-report=term
+
+      - name: Upload coverage to Codecov
+        if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11'
+        uses: codecov/codecov-action@v4
+        with:
+          files: mrcis/coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
+
+  lint-commits:
+    name: Lint commit messages
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate PR commits with commitlint
+        uses: wagoid/commitlint-github-action@v6
+        with:
+          configFile: .github/commitlint.config.js
+
+  pre-commit:
+    name: Pre-commit checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Set up Python
+        run: uv python install 3.11
+
+      - name: Install dependencies
+        working-directory: mrcis
+        run: uv sync --dev
+
+      - name: Run pre-commit
+        working-directory: mrcis
+        run: uv run pre-commit run --all-files
