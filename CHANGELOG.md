@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/JonnyDB/code-graph-mcp/compare/v1.0.0...v1.0.1) (2026-02-08)
+
+### 🐛 Bug Fixes
+
+* **ci:** anchor sed pattern to only update project version in pyproject.toml ([64531bc](https://github.com/JonnyDB/code-graph-mcp/commit/64531bc2fc2590e142ce59a4a175c4cc3d943549))
+* move entity/relation counts from StatePort to RelationGraphPort for Neo4j compatibility ([546d02b](https://github.com/JonnyDB/code-graph-mcp/commit/546d02b8a0693cc966972bad36e10cdbcf318cc5))
+
 ## 1.0.0 (2026-02-08)
 
 ### ✨ Features
