@@ -298,9 +298,9 @@ class Neo4jRelationGraph:
         """Count relations for a repository (as source or target)."""
         async with self._session() as session:
             result = await session.run(
-                "MATCH ()-[r:RELATES_TO]->() "
-                "WHERE r.source_repository_id = $repo_id "
-                "OR r.target_repository_id = $repo_id "
+                "MATCH (s:Entity)-[r:RELATES_TO]->(t:Entity) "
+                "WHERE s.repository_id = $repo_id "
+                "OR t.repository_id = $repo_id "
                 "RETURN count(r) AS cnt",
                 {"repo_id": repo_id},
             )

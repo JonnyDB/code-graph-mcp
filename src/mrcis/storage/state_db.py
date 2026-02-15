@@ -47,9 +47,11 @@ class StateDB:
         self._conn = await aiosqlite.connect(self.db_path)
         self._conn.row_factory = aiosqlite.Row
 
-        # Enable foreign keys and WAL mode for concurrent reader support
+        # Enable foreign keys, WAL mode for concurrent reader support,
+        # and busy_timeout so writers retry instead of failing immediately
         await self._conn.execute("PRAGMA foreign_keys = ON")
         await self._conn.execute("PRAGMA journal_mode = WAL")
+        await self._conn.execute("PRAGMA busy_timeout = 5000")
 
         # Apply migrations
         await self._apply_migrations()

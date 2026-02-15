@@ -108,7 +108,7 @@ class TestServerRuntimeWriterMode:
             assert mock_context.is_writer is True
             # 5 writer tasks: process_backlog, retry_failed, resolver, watcher, heartbeat
             assert len(mock_context.background_tasks) == 5
-            mock_init.assert_called_once_with(config)
+            mock_init.assert_called_once_with(config, is_writer=True)
 
     @pytest.mark.asyncio
     async def test_writer_startup_calls_startup_indexing(self, tmp_path: Path):
@@ -189,6 +189,8 @@ class TestServerRuntimeReadOnlyMode:
             assert len(mock_context.background_tasks) == 1
             # startup_indexing should NOT be called in read-only mode
             mock_startup.assert_not_called()
+            # initialize_services should be called with is_writer=False
+            mock_init.assert_called_once_with(config, is_writer=False)
 
     @pytest.mark.asyncio
     async def test_readonly_stop_does_not_delete_foreign_lock(self, tmp_path: Path):

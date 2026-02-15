@@ -25,12 +25,14 @@ from mrcis.storage.state_db import StateDB
 from mrcis.utils.logging import configure_logging
 
 
-async def initialize_services(config: Config) -> ServerContext:
+async def initialize_services(config: Config, *, is_writer: bool = True) -> ServerContext:
     """
     Initialize all services.
 
     Args:
         config: Loaded configuration.
+        is_writer: Whether this instance holds the writer lock.
+            When False, skip write operations (crash recovery, reconciliation).
 
     Returns:
         ServerContext with all initialized services.
@@ -39,19 +41,22 @@ async def initialize_services(config: Config) -> ServerContext:
     state_db = StateDB(config.storage.data_directory / config.storage.state_db_name)
     await state_db.initialize()
 
-    recovered = await state_db.recover_from_crash()
-    if recovered > 0:
-        logger.info("Recovered {} files from interrupted indexing", recovered)
+    if is_writer:
+        recovered = await state_db.recover_from_crash()
+        if recovered > 0:
+            logger.info("Recovered {} files from interrupted indexing", recovered)
 
-    # Reconcile config file with database state
-    reconciler = ConfigReconciler(state_db, config)
-    reconcile_result = await reconciler.reconcile()
-    logger.info(
-        "Config reconciled: added={} removed={} unchanged={}",
-        len(reconcile_result.added),
-        len(reconcile_result.removed),
-        len(reconcile_result.unchanged),
-    )
+        # Reconcile config file with database state
+        reconciler = ConfigReconciler(state_db, config)
+        reconcile_result = await reconciler.reconcile()
+        logger.info(
+            "Config reconciled: added={} removed={} unchanged={}",
+            len(reconcile_result.added),
+            len(reconcile_result.removed),
+            len(reconcile_result.unchanged),
+        )
+    else:
+        logger.info("Read-only instance — skipping crash recovery and reconciliation")
 
     # Create storage backends via factory
     factory = StorageBackendFactory(config)
@@ -218,7 +223,7 @@ class ServerRuntime:
 
         # Initialize all services
         logger.info("Initializing services...")
-        self._context = await initialize_services(config)
+        self._context = await initialize_services(config, is_writer=self._is_writer)
         self._context.is_writer = self._is_writer
         logger.info("All services initialized")
 
