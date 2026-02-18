@@ -77,9 +77,15 @@ class EmbeddingService:
         if self._client is None:
             raise RuntimeError("EmbeddingService not initialized. Call initialize() first.")
 
+        inputs = (
+            [t + self.config.eos_token for t in texts]
+            if self.config.append_eos_token
+            else list(texts)
+        )
+
         response = await self._client.embeddings.create(
             model=self.config.model,
-            input=list(texts),
+            input=inputs,
         )
 
         # Sort by index to maintain order (API may return out of order)

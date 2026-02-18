@@ -38,6 +38,13 @@ embedding:
   batch_size: 100
   # Timeout in seconds for each embedding API request (5-300)
   timeout_seconds: 30.0
+  # Append an EOS token to each text before embedding.
+  # Enable this when using LM Studio (or any llama.cpp-based server) if you see
+  # the warning: "At least one last token in strings embedded is not SEP".
+  # Most LLaMA-based models expect </s>; BERT-style models use [SEP].
+  append_eos_token: false
+  # The EOS token string to append (only used when append_eos_token is true)
+  eos_token: "</s>"
 
 # --- Storage ---
 # MRCIS supports two storage backends:

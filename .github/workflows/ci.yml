@@ -69,7 +69,7 @@ jobs:
       - name: Validate PR commits with commitlint
         uses: wagoid/commitlint-github-action@v6
         with:
-          configFile: .github/commitlint.config.js
+          configFile: .github/commitlint.config.mjs
 
   pre-commit:
     name: Pre-commit checks

@@ -26,6 +26,8 @@ class EmbeddingConfig(BaseModel):
     dimensions: int = Field(default=1024, ge=64, le=4096)
     batch_size: int = Field(default=100, ge=1, le=1000)
     timeout_seconds: float = Field(default=30.0, ge=5.0, le=300.0)
+    append_eos_token: bool = False
+    eos_token: str = "</s>"
 
     @field_validator("api_url")
     @classmethod

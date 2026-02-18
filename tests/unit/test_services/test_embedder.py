@@ -142,6 +142,79 @@ class TestEmbedQuery:
         assert len(result) == 1024
 
 
+class TestEosToken:
+    """Test EOS token appending behavior."""
+
+    @pytest.mark.asyncio
+    async def test_eos_token_appended_when_enabled(self, embedding_config: EmbeddingConfig) -> None:
+        """Should append EOS token to each text when append_eos_token is True."""
+        embedding_config.append_eos_token = True
+        embedding_config.eos_token = "</s>"
+        service = EmbeddingService(embedding_config)
+
+        captured_input: list[str] = []
+
+        async def mock_create(**kwargs: Any) -> MagicMock:
+            captured_input.extend(kwargs["input"])
+            response = MagicMock()
+            response.data = [MagicMock(index=0, embedding=[0.1] * 1024)]
+            return response
+
+        mock_client = AsyncMock()
+        mock_client.embeddings.create = mock_create
+        service._client = mock_client
+
+        await service.embed_texts(["hello world"])
+
+        assert captured_input == ["hello world</s>"]
+
+    @pytest.mark.asyncio
+    async def test_eos_token_not_appended_by_default(
+        self, embedding_config: EmbeddingConfig
+    ) -> None:
+        """Should not append EOS token when append_eos_token is False (default)."""
+        service = EmbeddingService(embedding_config)
+
+        captured_input: list[str] = []
+
+        async def mock_create(**kwargs: Any) -> MagicMock:
+            captured_input.extend(kwargs["input"])
+            response = MagicMock()
+            response.data = [MagicMock(index=0, embedding=[0.1] * 1024)]
+            return response
+
+        mock_client = AsyncMock()
+        mock_client.embeddings.create = mock_create
+        service._client = mock_client
+
+        await service.embed_texts(["hello world"])
+
+        assert captured_input == ["hello world"]
+
+    @pytest.mark.asyncio
+    async def test_custom_eos_token(self, embedding_config: EmbeddingConfig) -> None:
+        """Should use custom EOS token string."""
+        embedding_config.append_eos_token = True
+        embedding_config.eos_token = "[SEP]"
+        service = EmbeddingService(embedding_config)
+
+        captured_input: list[str] = []
+
+        async def mock_create(**kwargs: Any) -> MagicMock:
+            captured_input.extend(kwargs["input"])
+            response = MagicMock()
+            response.data = [MagicMock(index=i, embedding=[0.1] * 1024) for i in range(2)]
+            return response
+
+        mock_client = AsyncMock()
+        mock_client.embeddings.create = mock_create
+        service._client = mock_client
+
+        await service.embed_texts(["foo", "bar"])
+
+        assert captured_input == ["foo[SEP]", "bar[SEP]"]
+
+
 class TestClose:
     """Test close method."""
 
