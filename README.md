@@ -225,6 +225,20 @@ ollama pull nomic-embed-text    # Smaller/faster — dimensions: 768
 ollama pull mxbai-embed-large   # Default/recommended — dimensions: 1024
 ```
 
+### Using LM Studio
+
+Point MRCIS at LM Studio's local server and set `append_eos_token: true` to silence the tokenizer warning that llama.cpp emits when the GGUF model lacks `tokenizer.ggml.add_eos_token` in its header:
+
+```yaml
+embedding:
+  api_url: http://localhost:1234/v1
+  api_key: lm-studio
+  model: your-model-name          # as shown in LM Studio
+  dimensions: 1024                # match your model's output dimensions
+  append_eos_token: true          # appends </s> to each text before embedding
+  # eos_token: "[SEP]"            # override for BERT-style models
+```
+
 ## Development
 
 ```bash

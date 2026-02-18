@@ -16,6 +16,8 @@ def test_embedding_config_defaults() -> None:
     assert config.dimensions == 1024
     assert config.batch_size == 100
     assert config.timeout_seconds == 30.0
+    assert config.append_eos_token is False
+    assert config.eos_token == "</s>"
 
 
 def test_embedding_config_custom_values() -> None:
