@@ -1,6 +1,6 @@
 [project]
 name = "mrcis"
-version = "1.0.1"
+version = "1.1.0"
 description = "Multi-Repository Code Intelligence System"
 readme = "README.md"
 requires-python = ">=3.11"

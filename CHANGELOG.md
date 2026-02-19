@@ -1,3 +1,14 @@
+## [1.1.0](https://github.com/JonnyDB/code-graph-mcp/compare/v1.0.1...v1.1.0) (2026-02-19)
+
+### ✨ Features
+
+* **embedding:** add EOS token support for LM Studio compatibility ([#1](https://github.com/JonnyDB/code-graph-mcp/issues/1)) ([c252864](https://github.com/JonnyDB/code-graph-mcp/commit/c2528649c753212bbfb75b5f8f71a38bd0d3afec))
+* **extractors:** Provide detailed parse error locations ([#2](https://github.com/JonnyDB/code-graph-mcp/issues/2)) ([a0ca206](https://github.com/JonnyDB/code-graph-mcp/commit/a0ca20633a3cde8d5a76ad4551e49e6561f92f00))
+
+### 🐛 Bug Fixes
+
+* prevent read-only instances from writing to locked SQLite DB ([038c3ae](https://github.com/JonnyDB/code-graph-mcp/commit/038c3ae27036c83a98144c4dbfdc6d22bfc60689))
+
 ## [1.0.1](https://github.com/JonnyDB/code-graph-mcp/compare/v1.0.0...v1.0.1) (2026-02-08)
 
 ### 🐛 Bug Fixes
