@@ -45,6 +45,28 @@ class ExtractorProtocol(Protocol):
         ...
 
 
+def _collect_parse_errors(node: Node, file_path: Path) -> list[str]:
+    """Walk the AST and collect ERROR/MISSING node locations."""
+    errors: list[str] = []
+    _walk_errors(node, file_path, errors)
+    return errors
+
+
+def _walk_errors(node: Node, file_path: Path, errors: list[str]) -> None:
+    if node.type == "ERROR":
+        start = node.start_point
+        errors.append(
+            f"Parse error in {file_path}:{start[0] + 1}:{start[1] + 1}"
+            f" (len={node.end_byte - node.start_byte})"
+        )
+    elif node.is_missing:
+        start = node.start_point
+        errors.append(f"Missing '{node.type}' in {file_path}:{start[0] + 1}:{start[1] + 1}")
+    else:
+        for child in node.children:
+            _walk_errors(child, file_path, errors)
+
+
 class TreeSitterExtractor(ABC):
     """
     Base class for Tree-sitter based extractors.
@@ -110,9 +132,10 @@ class TreeSitterExtractor(ABC):
             tree, source, context.file_path, context.file_id, context.repository_id
         )
 
-        # Check for parse errors
+        # Check for parse errors and collect their locations
         if tree.root_node.has_error:
-            result.parse_errors.append(f"Parse errors in {context.file_path}")
+            error_details = _collect_parse_errors(tree.root_node, context.file_path)
+            result.parse_errors.extend(error_details)
 
         return result
 
