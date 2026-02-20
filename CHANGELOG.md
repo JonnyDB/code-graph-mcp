@@ -1,3 +1,9 @@
+## [1.1.1](https://github.com/JonnyDB/code-graph-mcp/compare/v1.1.0...v1.1.1) (2026-02-20)
+
+### 🐛 Bug Fixes
+
+* **extractors:** Use tsx grammar for .tsx files to support JSX syntax ([#3](https://github.com/JonnyDB/code-graph-mcp/issues/3)) ([f09d633](https://github.com/JonnyDB/code-graph-mcp/commit/f09d6339f17d2aeba06ef4f6744b385641c31e07))
+
 ## [1.1.0](https://github.com/JonnyDB/code-graph-mcp/compare/v1.0.1...v1.1.0) (2026-02-19)
 
 ### ✨ Features
