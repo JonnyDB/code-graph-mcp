@@ -4,7 +4,8 @@ from pathlib import Path
 from typing import ClassVar
 from uuid import UUID, uuid4
 
-from tree_sitter import Node, Tree
+from tree_sitter import Node, Parser, Tree
+from tree_sitter_language_pack import get_parser
 
 from mrcis.extractors.base import TreeSitterExtractor
 from mrcis.models.entities import (
@@ -32,6 +33,8 @@ class TypeScriptExtractor(TreeSitterExtractor):
     - Variables/constants
     """
 
+    _tsx_parser: Parser | None = None
+
     _SKIP_NAMES: ClassVar[set[str]] = {
         "parseInt",
         "parseFloat",
@@ -55,6 +58,14 @@ class TypeScriptExtractor(TreeSitterExtractor):
     def get_supported_extensions(self) -> set[str]:
         """Return supported file extensions."""
         return {".ts", ".tsx"}
+
+    def _select_parser(self, file_path: Path) -> Parser:
+        """Return tsx parser for .tsx files, typescript parser otherwise."""
+        if file_path.suffix.lower() == ".tsx":
+            if self._tsx_parser is None:
+                self._tsx_parser = get_parser("tsx")
+            return self._tsx_parser
+        return super()._select_parser(file_path)
 
     def _extract_from_tree(
         self,

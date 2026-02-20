@@ -108,6 +108,16 @@ class TreeSitterExtractor(ABC):
         """Check if this extractor supports the file."""
         return file_path.suffix.lower() in self.get_supported_extensions()
 
+    def _select_parser(self, _file_path: Path) -> Parser:
+        """Return the parser to use for the given file.
+
+        Subclasses may override this to select a different grammar per file
+        extension (e.g. TypeScript vs TSX).
+        """
+        if self._parser is None:
+            raise RuntimeError("Parser not initialized")
+        return self._parser
+
     async def extract_with_context(self, context: ExtractionContext) -> ExtractionResult:
         """Parse file and extract entities using context object.
 
@@ -124,8 +134,8 @@ class TreeSitterExtractor(ABC):
         # Read file (use pre-read bytes if available)
         source = context.source_bytes if context.source_bytes else context.file_path.read_bytes()
 
-        # Parse
-        tree = self._parser.parse(source)
+        # Parse — subclasses may select a different parser per file extension
+        tree = self._select_parser(context.file_path).parse(source)
 
         # Extract
         result = self._extract_from_tree(

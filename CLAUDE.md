@@ -397,6 +397,18 @@ uv run mrcis reindex my-repo --config config.yaml --force  # Reset failures too
 
 ## Development Guidelines
 
+### Commit Message Style
+
+Use Conventional Commits format with **sentence case** after the colon (capitalize the first word):
+
+```
+fix(extractors): Use tsx grammar for .tsx files to support JSX syntax
+feat(tools): Add receiver-aware call resolution
+```
+
+- Format: `type(scope): Subject line` — subject is sentence case (first word capitalized)
+- Body paragraphs are also sentence case
+
 ### Code Style
 
 - **Line Length**: 100 characters
